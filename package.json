@@ -1,0 +1,14 @@
+{
+  "name": "tuber",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "author": "Takuya Sawada",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "command-exists": "^1.2.9",
+    "electron-store": "^7.0.2",
+    "ffmpeg-static": "^4.2.7",
+    "jquery": "^3.5.1"
+  }
+}

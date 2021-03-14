@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Tuber</title>
+		<style>
+			html, body {
+				width: 100vw;
+				height: 100vh;
+				margin: 0;
+				padding: 0;
+				background: black;
+				-webkit-app-region: drag;
+			}
+
+			video {
+				width: 100vw;
+				height: 100vh;
+			}
+		</style>
+		<script src="asset:///node_modules/jquery/dist/jquery.min.js"></script>
+		<script>
+			$(() => {
+				$(window).dblclick(() => {
+					api.fullscreen();
+				});
+
+				$(window).contextmenu(() => {
+					api.contextmenu();
+				});
+
+				const video = $('#video')[0];
+
+				const controller = new AbortController();
+				const signal = controller.signal;
+
+				$(window).on('unload', () => {
+					console.log('unload');
+					controller.abort();
+				});
+
+				if (window.location.hash.length > 1) {
+					fetch('tv://localhost/' + window.location.hash.substring(1), { signal }).then((response) => {
+						const reader = response.body.getReader();
+
+						const ms = new MediaSource();
+						video.src = window.URL.createObjectURL(ms);
+
+						let sb;
+
+						function pump() {
+							return reader.read().then(({ done, value: segment }) => {
+								if (done) {
+									ms.endOfStream();
+								} else {
+									sb.appendBuffer(segment);
+								}
+							});
+						}
+
+						ms.addEventListener('sourceopen', () => {
+							console.log('sourceopen', ms);
+							if (ms.readyState === 'open') {
+								console.log(ms.readyState);
+								sb = ms.addSourceBuffer('video/mp4; codecs="avc1.4d401f, mp4a.40.2"');
+								sb.addEventListener('updateend', pump);
+								pump();
+								video.play();
+							}
+						});
+					});
+				}
+			});
+		</script>
+	</head>
+	<body>
+		<video id="video"></video>
+	</body>
+</html>
