@@ -139,6 +139,15 @@ app.on('ready', () => {
 
 	const menu = Menu.buildFromTemplate([
 		{
+			label: '音声をミュート',
+			click: () => {
+				mainWindow.webContents.setAudioMuted(!mainWindow.webContents.isAudioMuted());
+			}
+		},
+		{
+			type: 'separator'
+		},
+		{
 			label: '地上デジタル',
 			submenu: menu_st
 		},
