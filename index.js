@@ -1,4 +1,4 @@
-const { app, protocol, ipcMain, Menu, BrowserWindow } = require('electron');
+const { app, protocol, screen, ipcMain, Menu, BrowserWindow } = require('electron');
 const Store = require('electron-store');
 const command_exists = require('command-exists').sync;
 const child_process = require('child_process');
@@ -59,6 +59,7 @@ app.on('ready', () => {
 		width: 1024,
 		height: 576,
 		frame: false,
+		center: true,
 		alwaysOnTop: true,
 		transparent: true,
 		vibrancy: 'menu',
@@ -170,4 +171,38 @@ app.on('ready', () => {
 		console.log('fullscreen');
 		mainWindow.setFullScreen(!mainWindow.isFullScreen());
 	});
+
+	if (process.platform === 'win32') {
+		try {
+			const mouse = require('win-mouse')();
+			let initWindowLocation = null;
+			let initCursorPoint = null;
+
+			ipcMain.on('drag', (event, start) => {
+				if (start) {
+					initWindowLocation = mainWindow.getPosition();
+					initCursorPoint = screen.getCursorScreenPoint();
+				} else {
+					mouse.emit('left-up');
+				}
+			});
+
+			mouse.on('left-drag', () => {
+				if (initWindowLocation) {
+					const [ x, y ] = initWindowLocation;
+					const diff = screen.getCursorScreenPoint();
+					diff.x -= initCursorPoint.x;
+					diff.y -= initCursorPoint.y;
+					mainWindow.setPosition(x + diff.x, y + diff.y);
+				}
+			});
+
+			mouse.on('left-up', () => {
+				initWindowLocation = null;
+				initCursorPoint = null;
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	}
 });

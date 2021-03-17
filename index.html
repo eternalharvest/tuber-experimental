@@ -9,7 +9,6 @@
 				margin: 0;
 				padding: 0;
 				background: black;
-				-webkit-app-region: drag;
 			}
 
 			video {
@@ -20,6 +19,9 @@
 		<script src="asset:///node_modules/jquery/dist/jquery.min.js"></script>
 		<script>
 			$(() => {
+				$(window).on('mousedown', () => { api.drag(true); });
+				$(window).on('click dblclick contextmenu', () => { api.drag(false); });
+
 				$(window).dblclick(() => {
 					api.fullscreen();
 				});
