@@ -81,7 +81,7 @@ app.on('ready', () => {
 		visibleOnFullScreen: true
 	});
 	mainWindow.setAspectRatio(16/9);
-	mainWindow.loadURL("asset:///index.html#" + config.get('channel', ''));
+	mainWindow.loadURL(`asset:///index.html#${config.get('channel','')}`, { reloadIgnoringCache: true });
 
 	const menu_st = [
 		{
@@ -119,7 +119,7 @@ app.on('ready', () => {
 
 	menu_st.forEach((item) => item.click = function() {
 		console.log(item);
-		mainWindow.webContents.loadURL('asset:///index.html#' + item.id).then(() => {
+		mainWindow.webContents.loadURL(`asset:///index.html#${item.id}`, { reloadIgnoringCache: true }).then(() => {
 			config.set('channel', item.id);
 			console.log('loaded');
 		}).catch((error) => {
@@ -129,7 +129,7 @@ app.on('ready', () => {
 
 	menu_bs.forEach((item) => item.click = function() {
 		console.log(item);
-		mainWindow.webContents.loadURL('asset:///index.html#' + item.id).then(() => {
+		mainWindow.webContents.loadURL(`asset:///index.html#${item.id}`, { reloadIgnoringCache: true }).then(() => {
 			console.log('loaded');
 		}).catch((error) => {
 			console.log(error);
