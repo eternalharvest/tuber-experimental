@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "Takuya Sawada",
   "license": "UNLICENSED",
+  "scripts": {
+    "app": "npx electron ."
+  },
   "devDependencies": {
     "electron": "^12.0.1"
   },
