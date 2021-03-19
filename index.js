@@ -4,6 +4,7 @@ const command_exists = require('command-exists').sync;
 const child_process = require('child_process');
 const path = require('path');
 const url = require('url');
+const http = require('http')
 
 const config = new Store({
 	channel: { type: 'string' },
@@ -16,6 +17,7 @@ const config = new Store({
 });
 
 const ffmpegPath = command_exists('ffmpeg') ? 'ffmpeg' : require('ffmpeg-static');
+console.log(ffmpegPath);
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'tv', privileges: { bypassCSP: true, supportFetchAPI: true } }]);
 app.on('ready', () => {
@@ -27,7 +29,7 @@ app.on('ready', () => {
 		const ffmpeg = child_process.spawn(
 			ffmpegPath,
 			[
-				'-i', 'http://10.1.10.211:8888' + url.parse(request.url).path,
+				'-i', 'http://192.168.3.18:8888' + url.parse(request.url).path,
 				'-preset', 'faster',
 				'-tune', 'zerolatency',
 				'-codec:v', 'h264',
@@ -84,26 +86,38 @@ app.on('ready', () => {
 	mainWindow.setAspectRatio(16/9);
 	mainWindow.loadURL(`asset:///index.html#${config.get('channel','')}`, { reloadIgnoringCache: true });
 
+	let body = "";
+	const req = http.request('http://192.168.3.18:40772/api/channels', (res) => {
+		res.on('data', (chunk) => {
+			body += chunk.toString()
+		});
+		res.on('end', () => {
+			//console.log(body)
+			//const jsonObject = JSON.parse(body);
+		});
+	})
+	req.end();
+
 	const menu_st = [
 		{
-			id: '19',
-			label: 'ＮＨＫ総合１・福井',
+			id: '47',
+			label: 'ＮＨＫ総合',
 		},
 		{
-			id: '21',
-			label: 'ＮＨＫＥテレ１・福井',
+			id: '50',
+			label: 'ＮＨＫＥテレ',
 		},
 		{
-			id: '20',
-			label: '福井放送１',
+			id: '48',
+			label: '福島中央テレビ',
 		},
 		{
-			id: '22',
-			label: '福井テレビ１',
+			id: '34',
+			label: 'ＦＴＶ福島テレビ',
 		},
 		{
-			id: '23',
-			label: 'HAB',
+			id: '31',
+			label: 'ＫＦＢ福島放送',
 		},
 	];
 
@@ -125,7 +139,7 @@ app.on('ready', () => {
 			console.log('loaded');
 		}).catch((error) => {
 			console.log(error);
-		});;
+		});
 	});
 
 	menu_bs.forEach((item) => item.click = function() {
@@ -134,7 +148,7 @@ app.on('ready', () => {
 			console.log('loaded');
 		}).catch((error) => {
 			console.log(error);
-		});;
+		});
 	});
 
 	const menu = Menu.buildFromTemplate([
